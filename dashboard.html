@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Family Bank — Member Dashboard">
+    <title>Family Bank — Dashboard</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+</head>
+
+<body>
+    <!-- ── Toast Container ── -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ── Loading Overlay ── -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Loading your account...</p>
+    </div>
+
+    <!-- ── Inactivity Warning ── -->
+    <div class="inactivity-bar hidden" id="inactivityBar">
+        ⚠️ You will be logged out due to inactivity in <span id="inactivityCountdown">60</span>s — <button
+            class="link-btn" id="stayActiveBtn" style="color:#0f172a;font-weight:700;">Stay Active</button>
+    </div>
+
+    <!-- ── Mobile Top Bar ── -->
+    <div class="topbar">
+        <div class="topbar-brand">
+            <span>🏦</span> Family Bank
+        </div>
+        <button class="menu-toggle" id="menuToggle">☰</button>
+    </div>
+
+    <!-- ── Sidebar Overlay (mobile) ── -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-layout">
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon">🏦</div>
+                    <div>
+                        <div class="brand-name">Family Bank</div>
+                        <div class="brand-sub">Member Portal</div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Menu</div>
+                <button class="nav-item active" data-section="dashboard">
+                    <span class="nav-icon">📊</span> Dashboard
+                </button>
+                <button class="nav-item" data-section="transfer">
+                    <span class="nav-icon">💸</span> Transfer
+                </button>
+                <button class="nav-item" data-section="transactions">
+                    <span class="nav-icon">📋</span> Transactions
+                </button>
+                <button class="nav-item" data-section="qrcode">
+                    <span class="nav-icon">📷</span> My QR Code
+                </button>
+
+                <div class="nav-section-label" style="margin-top:1rem;">Settings</div>
+                <button class="nav-item" id="themeToggleNav">
+                    <span class="nav-icon">🌙</span> <span id="themeLabel">Light Mode</span>
+                </button>
+                <button class="nav-item" id="logoutNav">
+                    <span class="nav-icon">🚪</span> Sign Out
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">User Name</div>
+                        <div class="user-role" id="userRole">Member</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <main class="main-content">
+
+            <!-- ══════════════════════════════════════
+                 DASHBOARD SECTION
+                 ══════════════════════════════════════ -->
+            <section class="content-section active" id="section-dashboard">
+                <div class="page-header">
+                    <h2>Dashboard</h2>
+                    <p>Welcome back, <span id="dashGreetName">User</span></p>
+                </div>
+
+                <!-- Balance Card -->
+                <div class="balance-card">
+                    <div class="balance-label">Available Balance</div>
+                    <div class="balance-amount" id="dashBalance">Rs. 0.00</div>
+                    <div class="balance-meta">
+                        <span>🏷️ <span id="dashAccountNo">FAM-0000</span></span>
+                        <span>📈 Interest: <span id="dashInterestRate">0</span>%/mo</span>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon accent">💰</div>
+                        <div class="stat-value" id="dashTotalIn">Rs. 0</div>
+                        <div class="stat-label">Total Received</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">💳</div>
+                        <div class="stat-value" id="dashTotalOut">Rs. 0</div>
+                        <div class="stat-label">Total Sent</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">📊</div>
+                        <div class="stat-value" id="dashTxCount">0</div>
+                        <div class="stat-label">Transactions</div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Transactions</div>
+                        <button class="btn btn-ghost btn-sm" data-section="transactions">View All →</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>From / To</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashRecentTx">
+                                <tr>
+                                    <td colspan="4">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+                                            <p>No transactions yet</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 TRANSFER SECTION
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-transfer">
+                <div class="page-header">
+                    <h2>Transfer Money</h2>
+                    <p>Send money to another family member</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card">
+                        <div class="card-title mb-2">New Transfer</div>
+                        <form id="transferForm" autocomplete="off">
+                            <div class="form-group">
+                                <label for="transferTo">Receiver Account Number</label>
+                                <input type="text" class="form-control" id="transferTo" placeholder="FAM-0002" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="transferAmount">Amount (Rs.)</label>
+                                <input type="number" class="form-control" id="transferAmount" placeholder="0.00" min="1"
+                                    step="0.01" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Transaction PIN (TPIN)</label>
+                                <div class="pin-input-group" id="transferTpinInputs">
+                                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric"
+                                        data-index="0">
+                                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric"
+                                        data-index="1">
+                                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric"
+                                        data-index="2">
+                                    <input type="password" class="pin-input" maxlength="1" inputmode="numeric"
+                                        data-index="3">
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block" id="transferBtn">
+                                Send Money
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-title mb-2">Transfer Info</div>
+                        <div class="alert alert-info">
+                            <span class="alert-icon">ℹ️</span>
+                            <span>Your current balance: <strong id="transferBalance">Rs. 0.00</strong></span>
+                        </div>
+                        <div class="alert alert-warning">
+                            <span class="alert-icon">⚠️</span>
+                            <span>3 wrong TPIN attempts will <strong>freeze your account</strong>.</span>
+                        </div>
+                        <p class="text-muted" style="font-size:0.85rem;margin-top:1rem;">
+                            All transfers are atomic and irreversible. Double-check the receiver account number before
+                            sending.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 TRANSACTIONS SECTION
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-transactions">
+                <div class="page-header">
+                    <h2>Transaction History</h2>
+                    <p>All your account transactions</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">All Transactions</div>
+                        <div style="display:flex;gap:0.5rem;">
+                            <select class="form-control" id="txFilterType"
+                                style="width:auto;padding:0.4rem 2rem 0.4rem 0.75rem;font-size:0.8rem;">
+                                <option value="all">All Types</option>
+                                <option value="transfer">Transfers</option>
+                                <option value="deposit">Deposits</option>
+                                <option value="withdraw">Withdrawals</option>
+                                <option value="interest">Interest</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Amount</th>
+                                    <th>By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allTxBody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+                                            <p>No transactions found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 QR CODE SECTION
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-qrcode">
+                <div class="page-header">
+                    <h2>My QR Code</h2>
+                    <p>Share your account QR for quick transfers</p>
+                </div>
+
+                <div class="card" style="max-width:400px;">
+                    <div class="qr-container" id="qrDisplay">
+                        <div id="qrCanvas"></div>
+                        <p class="qr-label mt-1" id="qrAccountLabel">FAM-0000</p>
+                        <p class="text-muted" style="font-size:0.8rem;">Scan this to get my account number</p>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- ── TPIN Modal (used for transfer confirmation) ── -->
+    <!-- Already inline in transfer form -->
+
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

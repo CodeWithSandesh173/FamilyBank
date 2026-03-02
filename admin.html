@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Family Bank — Admin Panel">
+    <title>Family Bank — Admin Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon"
+        href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+</head>
+
+<body>
+    <!-- ── Toast Container ── -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ── Loading Overlay ── -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text">Loading admin panel...</p>
+    </div>
+
+    <!-- ── Inactivity Warning ── -->
+    <div class="inactivity-bar hidden" id="inactivityBar">
+        ⚠️ You will be logged out due to inactivity in <span id="inactivityCountdown">60</span>s — <button
+            class="link-btn" id="stayActiveBtn" style="color:#0f172a;font-weight:700;">Stay Active</button>
+    </div>
+
+    <!-- ── Mobile Top Bar ── -->
+    <div class="topbar">
+        <div class="topbar-brand"><span>🏦</span> Admin Panel</div>
+        <button class="menu-toggle" id="menuToggle">☰</button>
+    </div>
+
+    <!-- ── Sidebar Overlay ── -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app-layout">
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand">
+                    <div class="brand-icon">🏦</div>
+                    <div>
+                        <div class="brand-name">Family Bank</div>
+                        <div class="brand-sub">Admin Panel</div>
+                    </div>
+                </div>
+            </div>
+
+            <nav class="sidebar-nav">
+                <div class="nav-section-label">Overview</div>
+                <button class="nav-item active" data-section="overview">
+                    <span class="nav-icon">📊</span> Overview
+                </button>
+
+                <div class="nav-section-label" style="margin-top:0.75rem;">Account Mgmt</div>
+                <button class="nav-item" data-section="new-account">
+                    <span class="nav-icon">➕</span> New Account
+                </button>
+                <button class="nav-item" data-section="all-users">
+                    <span class="nav-icon">👥</span> All Users
+                </button>
+
+                <div class="nav-section-label" style="margin-top:0.75rem;">Banking</div>
+                <button class="nav-item" data-section="deposit-withdraw">
+                    <span class="nav-icon">💵</span> Deposit / Withdraw
+                </button>
+                <button class="nav-item" data-section="interest">
+                    <span class="nav-icon">📈</span> Interest
+                </button>
+                <button class="nav-item" data-section="all-transactions">
+                    <span class="nav-icon">📋</span> All Transactions
+                </button>
+
+                <div class="nav-section-label" style="margin-top:0.75rem;">Settings</div>
+                <button class="nav-item" id="themeToggleNav">
+                    <span class="nav-icon">🌙</span> <span id="themeLabel">Light Mode</span>
+                </button>
+                <button class="nav-item" onclick="window.location.href='dashboard.html'">
+                    <span class="nav-icon">📊</span> My Dashboard
+                </button>
+                <button class="nav-item" id="logoutNav">
+                    <span class="nav-icon">🚪</span> Sign Out
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">A</div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Admin</div>
+                        <div class="user-role">Administrator</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <main class="main-content">
+
+            <!-- ══════════════════════════════════════
+                 OVERVIEW
+                 ══════════════════════════════════════ -->
+            <section class="content-section active" id="section-overview">
+                <div class="page-header">
+                    <h2>Admin Overview</h2>
+                    <p>Bank-wide statistics and quick actions</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon accent">💰</div>
+                        <div class="stat-value" id="adminTotalBalance">Rs. 0</div>
+                        <div class="stat-label">Total Bank Balance</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon success">👥</div>
+                        <div class="stat-value" id="adminTotalUsers">0</div>
+                        <div class="stat-label">Total Accounts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon info">✅</div>
+                        <div class="stat-value" id="adminActiveUsers">0</div>
+                        <div class="stat-label">Active Accounts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon danger">🚫</div>
+                        <div class="stat-value" id="adminInactiveUsers">0</div>
+                        <div class="stat-label">Frozen / Closed</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon warning">📊</div>
+                        <div class="stat-value" id="adminTotalTx">0</div>
+                        <div class="stat-label">Total Transactions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon accent">📈</div>
+                        <div class="stat-value" id="adminGlobalRate">0%</div>
+                        <div class="stat-label">Global Interest Rate</div>
+                    </div>
+                </div>
+
+                <!-- Recent transactions preview -->
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Recent Transactions</div>
+                        <button class="btn btn-ghost btn-sm" data-section="all-transactions">View All →</button>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Amount</th>
+                                    <th>By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminRecentTx">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+                                            <p>No transactions yet</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 NEW ACCOUNT
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-new-account">
+                <div class="page-header">
+                    <h2>Open New Account</h2>
+                    <p>Create a new family member account</p>
+                </div>
+
+                <div class="card" style="max-width:550px;">
+                    <form id="newAccountForm" autocomplete="off">
+                        <div class="form-group">
+                            <label for="newFullName">Full Name</label>
+                            <input type="text" class="form-control" id="newFullName" placeholder="John Doe" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="newEmail">Email Address</label>
+                            <input type="email" class="form-control" id="newEmail" placeholder="john@example.com"
+                                required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="newAccountNumber">Account Number</label>
+                                <input type="text" class="form-control" id="newAccountNumber" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="newBalance">Starting Balance (Rs.)</label>
+                                <input type="number" class="form-control" id="newBalance" placeholder="0.00" min="0"
+                                    step="0.01" value="0" required>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <span class="alert-icon">ℹ️</span>
+                            <span>The user will set their own password and PINs during account activation.</span>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block" id="createAccountBtn">
+                            Create Account
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 ALL USERS
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-all-users">
+                <div class="page-header">
+                    <h2>All Users</h2>
+                    <p>Manage family member accounts</p>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Account</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Balance</th>
+                                    <th>Status</th>
+                                    <th>Setup</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="allUsersBody">
+                                <tr>
+                                    <td colspan="7">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">👥</div>
+                                            <p>No users found</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 DEPOSIT / WITHDRAW
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-deposit-withdraw">
+                <div class="page-header">
+                    <h2>Deposit / Withdraw</h2>
+                    <p>Manage account balances</p>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Deposit -->
+                    <div class="card">
+                        <div class="card-title mb-2" style="color:var(--success);">💰 Deposit</div>
+                        <form id="depositForm" autocomplete="off">
+                            <div class="form-group">
+                                <label for="depositAccount">Account Number</label>
+                                <input type="text" class="form-control" id="depositAccount" placeholder="FAM-0001"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="depositAmount">Amount (Rs.)</label>
+                                <input type="number" class="form-control" id="depositAmount" placeholder="0.00" min="1"
+                                    step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-success btn-block">Deposit</button>
+                        </form>
+                    </div>
+
+                    <!-- Withdraw -->
+                    <div class="card">
+                        <div class="card-title mb-2" style="color:var(--danger);">💳 Withdraw</div>
+                        <form id="withdrawForm" autocomplete="off">
+                            <div class="form-group">
+                                <label for="withdrawAccount">Account Number</label>
+                                <input type="text" class="form-control" id="withdrawAccount" placeholder="FAM-0001"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="withdrawAmount">Amount (Rs.)</label>
+                                <input type="number" class="form-control" id="withdrawAmount" placeholder="0.00" min="1"
+                                    step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-danger btn-block">Withdraw</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 INTEREST
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-interest">
+                <div class="page-header">
+                    <h2>Interest Management</h2>
+                    <p>Set rates and apply monthly interest</p>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Global Rate -->
+                    <div class="card">
+                        <div class="card-title mb-2">Global Interest Rate</div>
+                        <form id="globalRateForm" autocomplete="off">
+                            <div class="form-group">
+                                <label for="globalRate">Monthly Rate (%)</label>
+                                <input type="number" class="form-control" id="globalRate" placeholder="0" min="0"
+                                    max="100" step="0.01" required>
+                            </div>
+                            <p class="text-muted mb-2" style="font-size:0.8rem;">Current rate: <strong
+                                    id="currentGlobalRate">0%</strong></p>
+                            <button type="submit" class="btn btn-primary btn-block">Update Global Rate</button>
+                        </form>
+                    </div>
+
+                    <!-- User-specific Rate -->
+                    <div class="card">
+                        <div class="card-title mb-2">User-Specific Rate</div>
+                        <form id="userRateForm" autocomplete="off">
+                            <div class="form-group">
+                                <label for="userRateAccount">Account Number</label>
+                                <input type="text" class="form-control" id="userRateAccount" placeholder="FAM-0001"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="userRate">Monthly Rate (%)</label>
+                                <input type="number" class="form-control" id="userRate" placeholder="0" min="0"
+                                    max="100" step="0.01" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-block">Set User Rate</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Apply Interest -->
+                <div class="card mt-2">
+                    <div class="card-title mb-1">Apply Monthly Interest</div>
+                    <p class="text-muted mb-2" style="font-size:0.85rem;">
+                        Formula: <code>newBalance = balance + (balance × rate/100)</code>.
+                        Last applied: <strong id="lastInterestDate">Never</strong>
+                    </p>
+                    <div class="alert alert-warning">
+                        <span class="alert-icon">⚠️</span>
+                        <span>Interest can only be applied once per month. This action is irreversible.</span>
+                    </div>
+                    <div class="actions-row">
+                        <button class="btn btn-success" id="applyInterestAll">Apply to All Users</button>
+                    </div>
+                    <div class="card-title mb-1 mt-2" style="font-size:0.9rem;">Apply to Specific User</div>
+                    <form id="applyInterestUserForm" autocomplete="off" style="max-width:350px;">
+                        <div class="form-group">
+                            <label for="interestUserAccount">Account Number</label>
+                            <input type="text" class="form-control" id="interestUserAccount" placeholder="FAM-0001"
+                                required>
+                        </div>
+                        <button type="submit" class="btn btn-success">Apply Interest</button>
+                    </form>
+                </div>
+            </section>
+
+            <!-- ══════════════════════════════════════
+                 ALL TRANSACTIONS
+                 ══════════════════════════════════════ -->
+            <section class="content-section" id="section-all-transactions">
+                <div class="page-header">
+                    <h2>All Transactions</h2>
+                    <p>Complete transaction log</p>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Transaction Log</div>
+                        <select class="form-control" id="adminTxFilter"
+                            style="width:auto;padding:0.4rem 2rem 0.4rem 0.75rem;font-size:0.8rem;">
+                            <option value="all">All Types</option>
+                            <option value="transfer">Transfers</option>
+                            <option value="deposit">Deposits</option>
+                            <option value="withdraw">Withdrawals</option>
+                            <option value="interest">Interest</option>
+                        </select>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>From</th>
+                                    <th>To</th>
+                                    <th>Amount</th>
+                                    <th>By</th>
+                                </tr>
+                            </thead>
+                            <tbody id="adminAllTxBody">
+                                <tr>
+                                    <td colspan="6">
+                                        <div class="empty-state">
+                                            <div class="empty-icon">📭</div>
+                                            <p>No transactions yet</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

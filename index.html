@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Family Bank — Secure private banking for your family">
+    <title>Family Bank — Login</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏦</text></svg>">
+</head>
+<body>
+    <!-- ── Toast Container ── -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- ── Loading Overlay ── -->
+    <div class="loading-overlay hidden" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p class="loading-text" id="loadingText">Loading...</p>
+    </div>
+
+    <!-- ============================================
+         LOGIN VIEW
+         ============================================ -->
+    <div class="auth-wrapper" id="authWrapper">
+        <div class="auth-container">
+
+            <!-- ── Login Card ── -->
+            <div class="auth-card" id="loginView">
+                <div class="auth-logo">
+                    <div class="logo-icon">🏦</div>
+                    <h1>Family Bank</h1>
+                    <p>Sign in to your account</p>
+                </div>
+
+                <form id="loginForm" autocomplete="off">
+                    <div class="form-group">
+                        <label for="loginEmail">Email Address</label>
+                        <input type="email" class="form-control" id="loginEmail" placeholder="you@example.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" class="form-control" id="loginPassword" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
+                        Sign In
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    <p>First time? <button class="link-btn" id="showActivation">Activate Your Account</button></p>
+                </div>
+
+                <!-- Theme toggle on auth page -->
+                <div style="display:flex;justify-content:center;margin-top:1rem;">
+                    <button class="theme-toggle" id="authThemeToggle" title="Toggle theme" type="button"></button>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 LPIN MODAL (after login)
+                 ============================================ -->
+            <div class="auth-card hidden" id="lpinView">
+                <div class="auth-logo">
+                    <div class="logo-icon">🔐</div>
+                    <h1>Verify Identity</h1>
+                    <p>Enter your 4-digit Login PIN</p>
+                </div>
+
+                <form id="lpinForm" autocomplete="off">
+                    <div class="pin-input-group" id="lpinInputs">
+                        <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="0">
+                        <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="1">
+                        <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="2">
+                        <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="3">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block" id="lpinBtn">Verify PIN</button>
+                </form>
+                <div class="auth-footer">
+                    <button class="link-btn" id="lpinLogout">Sign out</button>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 NEW DEVICE VERIFICATION
+                 ============================================ -->
+            <div class="auth-card hidden" id="deviceVerifyView">
+                <div class="auth-logo">
+                    <div class="logo-icon">📱</div>
+                    <h1>New Device Detected</h1>
+                    <p>Verify your identity to continue on this device</p>
+                </div>
+
+                <div class="alert alert-info mb-2">
+                    <span class="alert-icon">ℹ️</span>
+                    <span>A verification email has been sent. Please verify and then enter your Transaction PIN below.</span>
+                </div>
+
+                <form id="deviceVerifyForm" autocomplete="off">
+                    <div class="form-group">
+                        <label>Transaction PIN (TPIN)</label>
+                        <div class="pin-input-group" id="deviceTpinInputs">
+                            <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="0">
+                            <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="1">
+                            <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="2">
+                            <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="3">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="deviceVerifyBtn">Verify Device</button>
+                </form>
+
+                <div class="auth-footer">
+                    <button class="link-btn" id="deviceResendEmail">Resend verification email</button>
+                </div>
+            </div>
+
+            <!-- ============================================
+                 ACCOUNT ACTIVATION FLOW
+                 ============================================ -->
+            <div class="auth-card hidden" id="activationView">
+                <div class="auth-logo">
+                    <div class="logo-icon">✨</div>
+                    <h1>Activate Account</h1>
+                    <p>Set up your banking credentials</p>
+                </div>
+
+                <!-- Step Indicator -->
+                <div class="step-indicator" id="activationSteps">
+                    <div class="step-dot active" data-step="1"></div>
+                    <div class="step-line"></div>
+                    <div class="step-dot" data-step="2"></div>
+                    <div class="step-line"></div>
+                    <div class="step-dot" data-step="3"></div>
+                    <div class="step-line"></div>
+                    <div class="step-dot" data-step="4"></div>
+                    <div class="step-line"></div>
+                    <div class="step-dot" data-step="5"></div>
+                </div>
+
+                <!-- Step 1: Enter Account Details -->
+                <div id="activationStep1">
+                    <h3 class="mb-1" style="font-size:1rem;">Step 1: Verify Your Account</h3>
+                    <p class="text-muted mb-2" style="font-size:0.85rem;">Enter the details provided by your admin.</p>
+                    <form id="activationStep1Form" autocomplete="off">
+                        <div class="form-group">
+                            <label for="actAccountNumber">Account Number</label>
+                            <input type="text" class="form-control" id="actAccountNumber" placeholder="FAM-0001" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="actEmail">Email Address</label>
+                            <input type="email" class="form-control" id="actEmail" placeholder="you@example.com" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Verify Account</button>
+                    </form>
+                </div>
+
+                <!-- Step 2: Account Verified -->
+                <div id="activationStep2" class="hidden">
+                    <div class="alert alert-success">
+                        <span class="alert-icon">✅</span>
+                        <span>Account verified! Your details match our records.</span>
+                    </div>
+                    <p class="text-muted mb-2" style="font-size:0.85rem;">Click below to proceed to email verification.</p>
+                    <button class="btn btn-primary btn-block" id="activationStep2Btn">Continue</button>
+                </div>
+
+                <!-- Step 3: Email Verification -->
+                <div id="activationStep3" class="hidden">
+                    <h3 class="mb-1" style="font-size:1rem;">Step 3: Verify Email</h3>
+                    <p class="text-muted mb-2" style="font-size:0.85rem;">First, create your account password.</p>
+                    <form id="activationStep3Form" autocomplete="off">
+                        <div class="form-group">
+                            <label for="actPassword">Create Password</label>
+                            <input type="password" class="form-control" id="actPassword" placeholder="Min 8 characters" minlength="8" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="actPasswordConfirm">Confirm Password</label>
+                            <input type="password" class="form-control" id="actPasswordConfirm" placeholder="Re-enter password" minlength="8" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block">Create Account & Send Verification</button>
+                    </form>
+                </div>
+
+                <!-- Step 4: Waiting for Verification -->
+                <div id="activationStep4" class="hidden">
+                    <div class="alert alert-info">
+                        <span class="alert-icon">📧</span>
+                        <span>Verification email sent! Check your inbox and click the link.</span>
+                    </div>
+                    <p class="text-muted mb-2" style="font-size:0.85rem;">After verifying, click below to continue.</p>
+                    <button class="btn btn-primary btn-block" id="activationCheckVerified">I've Verified My Email</button>
+                    <div class="mt-1 text-center">
+                        <button class="link-btn" id="activationResendEmail">Resend email</button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Set PINs -->
+                <div id="activationStep5" class="hidden">
+                    <h3 class="mb-1" style="font-size:1rem;">Step 5: Set Your PINs</h3>
+                    <p class="text-muted mb-2" style="font-size:0.85rem;">These PINs protect your account. Keep them safe!</p>
+                    <form id="activationStep5Form" autocomplete="off">
+                        <div class="form-group">
+                            <label>Login PIN (LPIN) — 4 digits</label>
+                            <div class="pin-input-group" id="actLpinInputs">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="0">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="1">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="2">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Login PIN</label>
+                            <div class="pin-input-group" id="actLpinConfirmInputs">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="0">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="1">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="2">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Transaction PIN (TPIN) — 4 digits</label>
+                            <div class="pin-input-group" id="actTpinInputs">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="0">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="1">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="2">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="3">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Confirm Transaction PIN</label>
+                            <div class="pin-input-group" id="actTpinConfirmInputs">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="0">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="1">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="2">
+                                <input type="password" class="pin-input" maxlength="1" inputmode="numeric" data-index="3">
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">Complete Setup</button>
+                    </form>
+                </div>
+
+                <div class="auth-footer">
+                    <button class="link-btn" id="showLogin">← Back to Login</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
